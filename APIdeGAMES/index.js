@@ -28,6 +28,20 @@ var DB = {
             year: 2010,
             price: 30
         }
+    ],
+    users: [
+        {
+            id: 1,
+            name: "Jonathas Rosa",
+            email: "jsilvarosa85@gmail.com",
+            senha: "jscript"
+        },
+        {
+            id: 5,
+            name: "Ingrid Mendez",
+            email: "img87@gmail.com",
+            senha: "imlg87"
+        }
     ]
 }
 //Listagem dos games no sistema.

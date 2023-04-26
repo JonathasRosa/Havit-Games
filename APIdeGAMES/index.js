@@ -113,7 +113,9 @@ app.put("/game/:id", (req, res) => {
        res.sendStatus(404);
      }
    } 
-})
+});
+
+app.post("/auth")
 
 app.listen(45678, () => {
     console.log("API RODANDO")

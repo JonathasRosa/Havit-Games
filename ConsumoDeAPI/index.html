@@ -8,18 +8,57 @@
     <hr>
     <h4>Lista de games</h4>
     <ul id="games"></ul>
+    <hr>
+    <input type="text" name="title" id="title" placeholder="Título"><br>
+    <input type="number" name="price" id="price" placeholder="Preço"><br>
+    <input type="number" name="year" id="year" placeholder="Ano"><br>
+    <button type="button" onclick="createGame()">Criar</button>
 </head>
 <body>
     
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
 <script>
+
+    function createGame(){
+        var titleInput = document.getElementById("title");
+        var yearInput = document.getElementById("year");
+        var priceInput = document.getElementById("price");
+        var game = {
+            title: titleInput.value,
+            price: priceInput.value,
+            year: yearInput.value
+        } 
+        axios.post("http://localhost:45678/game", game).then(response => {
+            if(response.status == 200){
+                alert("Game cadastrado!")
+            }
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
+    function deleteGame(listItem){
+        var id = listItem.getAttribute("data-id")
+        console.log(id)
+    }
+
     axios.get("http://localhost:45678/games").then(response => {
         var games = response.data;
         var list = document.getElementById("games");
         games.forEach(game => {
             var item = document.createElement("li");
+            item.setAttribute("data-id", game.id);
+            item.setAttribute("data-title", game.title);
+            item.setAttribute("data-price", game.price);
+            item.setAttribute("data-year", game.year);
             item.innerHTML = game.id + " - " + game.title + " - $" + game.price;
+            var deleteBtn = document.createElement("button");
+            deleteBtn.innerHTML = "Deletar";
+            deleteBtn.addEventListener("click", function(){
+                deleteGame(item)
+            })
+            item.appendChild(deleteBtn);
             list.appendChild(item);
         });
         

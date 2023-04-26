@@ -34,13 +34,13 @@ var DB = {
             id: 1,
             name: "Jonathas Rosa",
             email: "jsilvarosa85@gmail.com",
-            senha: "jscript"
+            password: "jscript"
         },
         {
             id: 5,
             name: "Ingrid Mendez",
             email: "img87@gmail.com",
-            senha: "imlg87"
+            password: "imlg87"
         }
     ]
 }
@@ -114,8 +114,28 @@ app.put("/game/:id", (req, res) => {
      }
    } 
 });
-
-app.post("/auth")
+//Endpoint de autenticação com JWT
+app.post("/auth", (req, res) => {
+    var { email, password } = req.body;
+    if (email != undefined) {
+        var user = DB.users.find(user => user.email == email);
+        if (user != undefined) {
+            if (user.password == password) {
+                res.status = 200;
+                res.json({token: "TOKEN FALSO"})
+            } else {
+                res.status(401);
+                res.json({err: "Credenciasis inválida."})
+            }
+        } else {
+            res.status(404);
+            res.json({ err: "O E-mail enviado não existe na base de dados!"});
+        }
+    } else {
+      res.status(400);
+      res.json({ err: "O E-mail enviado é inválido" });
+    }
+});
 
 app.listen(45678, () => {
     console.log("API RODANDO")

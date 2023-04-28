@@ -11,6 +11,7 @@ Nenhum
 Caso essa reposta aconteça você vai receber a listagem de todos os games.
 
 ´´´
+
 Exemplo de resposta:
 
   [
@@ -33,14 +34,15 @@ Exemplo de resposta:
             price: 30
         }
     ]
-    
+   
+   
 ´´´
-
 #### Falha na autenticação! 401
 Caso essa resposta aconteça, issi significa que aconteceu alguma falha durante ao processo de autenticação da requisção. Motivo: Token inválido, Token expirado.
 
-´´´
 Exemplo de resposta:
+
+´´´
 
 {
   "err": "Token inválido!"
@@ -53,21 +55,22 @@ Esse endpoit é responsável por fazer o processo de login.
 #### Parametros
 Email: E-mail do usuário cadastrado no sistema.
 Password: Senha do usuário cadastrado no sistema com o determinado email.
+Exemplo de resposta:
 
 ´´´
-Exemplo:
+
 {
 email: "jsilvarosa85@gmail.com",
 password: "jscript"
 }
+
 ´´´
 
 #### Respostas
 #### OK! 200
 Caso essa reposta aconteça você vai receber o token JWT para conseguir acessar endpoints protegidos na API.
-
-´´´
 Exemplo de resposta:
+
 ´´´
         {
             "token":
@@ -77,9 +80,9 @@ Exemplo de resposta:
 
 #### Falha na autenticação! 401
 Caso essa resposta aconteça, issi significa que aconteceu alguma falha durante ao processo de autenticação da requisção. Motivo: Senha ou email incorretos.
+Exemplo de resposta:
 
 ´´´
-Exemplo de resposta:
 
 {
   "err": "Credenciais inválidas!"

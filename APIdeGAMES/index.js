@@ -2,11 +2,38 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
+
+//Após instalar o pacote (npm install --save jsonwebtoken)
+//Chave secreta:
+const JWTSecret = "51005353JRosa"
 
 app.use(cors());
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// HEADERS - proteção de rotas utilizando JWT
+function auth(req, res, next){
+    const authToken = req.headers['authorization'];
+    if (authToken != undefined) {
+        const bearer = authToken.split(' ');
+        var token = bearer[1];
+        jwt.verify(token, JWTSecret, (err, dataToken) => {
+            if (err) {
+                res.status(401);
+                res.json({ err: "Token Inválido" });
+            } else {
+                req.token = token;
+                req.loggedUser = { id: data.id, email: data.email };
+                req.empresa = "Havit-Games";
+                next();
+            }
+        });
+    } else {
+        res.status(401);
+        res.json({ err: "Token Inválido" });
+    } 
+}
 
 var DB = {
     games: [
@@ -37,20 +64,21 @@ var DB = {
             password: "jscript"
         },
         {
-            id: 5,
+            id: 2,
             name: "Ingrid Mendez",
             email: "img87@gmail.com",
             password: "imlg87"
         }
     ]
 }
+
 //Listagem dos games no sistema.
-app.get("/games", (req, res) => {
+app.get("/games", auth, (req, res) => {
     res.statusCode = 200;
-    res.json(DB.games);
+    res.json({games: DB.games });
 });
 //Pega um game específico com sucesso ou erro.
-app.get("/game/:id", (req, res) => {
+app.get("/game/:id", auth,(req, res) => {
     if (isNaN(req.params.id)) {
         res.sendStatus(400)
     } else {
@@ -65,76 +93,83 @@ app.get("/game/:id", (req, res) => {
     }
 })
 //EndPoint para cadastrar dados/game
-app.post("/game", (req, res) => {
-    var { title, year, price } = req.body;
-    DB.games.push({
-        id: 20,
-        title,
-        year,
-        price
-    });
-    res.sendStatus(200);
-})
+app.post("/game", auth, (req, res) => {
+  var { title, year, price } = req.body;
+  DB.games.push({
+    id: 20,
+    title,
+    year,
+    price,
+  });
+  res.sendStatus(200);
+});
 //Metodo delete
-app.delete("/game/:id", (req, res) => {
-    if (isNaN(req.params.id)) {
-        res.sendStatus(400);
+app.delete("/game/:id", auth, (req, res) => {
+  if (isNaN(req.params.id)) {
+    res.sendStatus(400);
+  } else {
+    var id = parseInt(req.params.id);
+    var index = DB.games.findIndex((g) => g.id == id);
+    if (index == -1) {
+      res.sendStatus(404);
     } else {
-        var id = parseInt(req.params.id);
-        var index = DB.games.findIndex(g => g.id == id);
-        if (index == -1) {
-            res.sendStatus(404);
-        } else {
-            DB.games.splice(index, 1)
-            res.sendStatus(200)
-        }
+      DB.games.splice(index, 1);
+      res.sendStatus(200);
     }
+  }
 });
 //Metodo de edição de dados
-app.put("/game/:id", (req, res) => {
-   if (isNaN(req.params.id)) {
-     res.sendStatus(400);
-   } else {
-     var id = parseInt(req.params.id);
-     var game = DB.games.find((g) => g.id == id);
-     if ((game = !undefined)) {
-         var { title, year, price } = req.body;
-         if (title != undefined) {
-             game.title = title;
-         }
-         if (year != undefined) {
-             game.year = year
-         }
-         if (price != undefined) {
-             game.price = price
-         }
-         res.sendStatus(200)
-     } else {
-       res.sendStatus(404);
-     }
-   } 
+app.put("/game/:id", auth, (req, res) => {
+  if (isNaN(req.params.id)) {
+    res.sendStatus(400);
+  } else {
+    var id = parseInt(req.params.id);
+    var game = DB.games.find((g) => g.id == id);
+    if ((game = !undefined)) {
+      var { title, year, price } = req.body;
+      if (title != undefined) {
+        game.title = title;
+      }
+      if (year != undefined) {
+        game.year = year;
+      }
+      if (price != undefined) {
+        game.price = price;
+      }
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  }
 });
 //Endpoint de autenticação com JWT
-app.post("/auth", (req, res) => {
-    var { email, password } = req.body;
-    if (email != undefined) {
-        var user = DB.users.find(user => user.email == email);
-        if (user != undefined) {
-            if (user.password == password) {
-                res.status = 200;
-                res.json({token: "TOKEN FALSO"})
+app.post("/auth", auth, (req, res) => {
+  var { email, password } = req.body;
+  if (email != undefined) {
+    var user = DB.users.find((u) => u.email == email);
+    if (user != undefined) {
+      if (user.password == password) {
+          jwt.sign({ id: user.id, email: user.email },JWTSecret,{ expiresIn: "48h" },(err, token) => {
+            if (err) {
+              res.status(400);
+              res.json({ err: "Falha interna" });
             } else {
-                res.status(401);
-                res.json({err: "Credenciasis inválida."})
+              res.status(200);
+              res.json({ token: token });
             }
-        } else {
-            res.status(404);
-            res.json({ err: "O E-mail enviado não existe na base de dados!"});
-        }
+        });
+      } else {
+        res.status(401);
+        res.json({ err: "Credenciasis inválida." });
+      }
     } else {
-      res.status(400);
-      res.json({ err: "O E-mail enviado é inválido" });
+      res.status(404);
+      res.json({ err: "O E-mail enviado não existe na base de dados!" });
     }
+  } else {
+    res.status(400);
+    res.json({ err: "O E-mail enviado é inválido" });
+  }
 });
 
 app.listen(45678, () => {

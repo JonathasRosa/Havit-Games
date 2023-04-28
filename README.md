@@ -1,13 +1,23 @@
 # Havit-Games
+
 ## API de Games
+
 Esta API é utilizada para consumo de uma lista de games cadastrados.
+
 ## Endpoints
+
 ### GET /games
+
 Esse endpoit é responsável por retornar a listagem de todos os games cadastrados no banco de dados.
+
 #### Parametros
+
 Nenhum
+
 #### Respostas
+
 #### OK! 200
+
 Caso essa reposta aconteça você vai receber a listagem de todos os games.
 
 ´´´
@@ -38,6 +48,7 @@ Exemplo de resposta:
    
 ´´´
 #### Falha na autenticação! 401
+
 Caso essa resposta aconteça, issi significa que aconteceu alguma falha durante ao processo de autenticação da requisção. Motivo: Token inválido, Token expirado.
 
 Exemplo de resposta:
@@ -51,10 +62,15 @@ Exemplo de resposta:
 ´´´
 
 ### POST /auth
+
 Esse endpoit é responsável por fazer o processo de login.
+
 #### Parametros
+
 Email: E-mail do usuário cadastrado no sistema.
+
 Password: Senha do usuário cadastrado no sistema com o determinado email.
+
 Exemplo de resposta:
 
 ´´´
@@ -67,8 +83,11 @@ password: "jscript"
 ´´´
 
 #### Respostas
+
 #### OK! 200
+
 Caso essa reposta aconteça você vai receber o token JWT para conseguir acessar endpoints protegidos na API.
+
 Exemplo de resposta:
 
 ´´´
@@ -79,7 +98,9 @@ Exemplo de resposta:
 ´´´
 
 #### Falha na autenticação! 401
+
 Caso essa resposta aconteça, issi significa que aconteceu alguma falha durante ao processo de autenticação da requisção. Motivo: Senha ou email incorretos.
+
 Exemplo de resposta:
 
 ´´´

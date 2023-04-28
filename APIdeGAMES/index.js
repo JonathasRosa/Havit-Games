@@ -74,23 +74,65 @@ var DB = {
 
 //Listagem dos games no sistema.
 app.get("/games", auth, (req, res) => {
-    res.statusCode = 200;
-    res.json({games: DB.games });
+  //Parametros para API RestFull
+  var HATEOAS = [
+    {
+      href: "http://localhost:45678/game/:0",
+      method: "DELETE",
+      rel: "delet_game"
+    },
+    {
+      href: "http://localhost:45678/game/:0",
+      method: "GET",
+      rel: "get_game"
+    },
+    {
+      href: "http://localhost:45678/auth",
+      method: "POST",
+      rel: "login"
+    }
+  ]
+  res.statusCode = 200;
+  res.json({games: DB.games, _link: HATEOAS });
 });
 //Pega um game específico com sucesso ou erro.
-app.get("/game/:id", auth,(req, res) => {
-    if (isNaN(req.params.id)) {
-        res.sendStatus(400)
+app.get("/game/:id", auth, (req, res) => {
+  if (isNaN(req.params.id)) {
+    res.sendStatus(400)
+  } else {
+    var id = parseInt(req.params.id);
+
+    var HATEOAS = [
+      {
+        href: "http://localhost:45678/game/"+id,
+        method: "DELETE",
+        rel: "delet_game",
+      },
+      {
+        href: "http://localhost:45678/game/"+id,
+        method: "PUT",
+        rel: "edit_game",
+      },
+      {
+        href: "http://localhost:45678/game/"+id,
+        method: "GET",
+        rel: "get_game",
+      },
+      {
+        href: "http://localhost:45678/games",
+        method: "GET",
+        rel: "get_all_ganes",
+      },
+    ];
+
+    var game = DB.games.find(g => g.id == id);
+    if (game = !undefined) {
+      res.statusCode = 200;
+      res.json({ game, _link: HATEOAS });
     } else {
-        var id = parseInt(req.params.id);
-        var game = DB.games.find(g => g.id == id);
-        if (game = !undefined) {
-            res.statusCode = 200;
-            res.json(game);
-        } else {
-            res.sendStatus(404)
-        }
+      res.sendStatus(404)
     }
+  }
 })
 //EndPoint para cadastrar dados/game
 app.post("/game", auth, (req, res) => {
